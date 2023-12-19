@@ -64,7 +64,7 @@ def upload(
     if len(photos) == 0:
         process_error(f'Photos do not exist in directory = {path}')
 
-    response = s3.list_objects(Bucket=bucket, Prefix=album)
+    response = s3.list_objects(Bucket=bucket, Prefix=album+YS_SLASH)
 
     if 'Contents' not in response:
         s3.put_object(Bucket=bucket, Key=album + YS_SLASH)
@@ -88,15 +88,15 @@ def download(
     config = check_and_get_config_file()
     bucket = config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME)
     s3 = create_s3_client(config)
-    check_dir_access(path, os.W_OK)
     
-    response = s3.list_objects(Bucket=bucket, Prefix=album)
+    response = s3.list_objects(Bucket=bucket, Prefix=album+YS_SLASH)
 
     if 'Contents' not in response:
         process_error(f'Album {album} does not exist')
 
     if not os.path.exists(path):
         os.makedirs(path)
+    check_dir_access(path, os.W_OK)
 
     for obj in response['Contents']:
         object_name = obj['Key']
@@ -127,7 +127,7 @@ def list(
         response = s3.list_objects(Bucket=config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME))
         regex = re.compile(S3_ALBUM_REGEX)
     else:
-        response = s3.list_objects(Bucket=config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME), Prefix=album)
+        response = s3.list_objects(Bucket=config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME), Prefix=album+YS_SLASH)
         regex = re.compile(ALBUM_FILE_REGEX.format(album))
     
     if 'Contents' not in response:
@@ -139,7 +139,7 @@ def list(
             result.append(match.group(1))
 
     if len(result) == 0:
-        process_error('Storage is empty')
+        process_error('Object is empty')
 
     process_success('\n'.join(result))
 
@@ -153,7 +153,7 @@ def delete(
     config = check_and_get_config_file()
     s3 = create_s3_client(config)
 
-    response = s3.list_objects(Bucket=config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME), Prefix=album)
+    response = s3.list_objects(Bucket=config.get(CONFIG_DEFAULT_SECTION, BUCKET_PARAM_NAME), Prefix=album+YS_SLASH)
     
     if 'Contents' not in response:
         process_error('Album does not exist')
