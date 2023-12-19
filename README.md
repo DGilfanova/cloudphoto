@@ -2,7 +2,7 @@
 
 ## Видеодоказательство работоспособности
 
-[Youtube](https://youtu.be/hWlwETKL0R8)
+[Youtube](https://youtu.be/B-64J7DLN1s)
 
 ## Инструкция по запуску
 
